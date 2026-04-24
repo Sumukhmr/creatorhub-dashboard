@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreatorHub - Content Tools Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --bg: #f5f7fa;
+            --surface: #ffffff;
+            --text: #333;
+            --text-muted: #666;
+            --border: #e0e0e0;
+            --success: #4CAF50;
+            --error: #f44336;
+            --warning: #ff9800;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            height: 70px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            margin-left: 50px;
+            gap: 5px;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px 8px 0 0;
+            color: rgba(255,255,255,0.8);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .nav-tab.active {
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tool-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tool-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 20px; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Voice Buttons */
+        .voice-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .voice-btn {
+            padding: 12px 24px;
+            border: 3px solid var(--border);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .voice-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .voice-btn.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        /* Results */
+        .result-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .result-box.success {
+            background: #e8f5e9;
+            border: 1px solid var(--success);
+        }
+
+        .result-box.error {
+            background: #ffebee;
+            border: 1px solid var(--error);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .loading.show { display: block; }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Audio Items */
+        .audio-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .audio-item audio { width: 100%; margin-top: 10px; }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-card {
+            background: #f8f9ff;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            background: #e8ebff;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 3px dashed var(--border);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .upload-icon { font-size: 48px; margin-bottom: 15px; }
+
+        /* File List */
+        .file-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .file-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .file-item-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-item-remove {
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        /* Progress */
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Dashboard Welcome */
+        .welcome-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .welcome-section h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .welcome-section p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tool-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .tool-card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .tool-card h3 {
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .tool-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 15px; }
+            .nav-tabs { margin-left: 20px; gap: 2px; }
+            .nav-tab { padding: 10px 15px; font-size: 0.8rem; }
+            .main-content { padding: 15px; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🚀 CreatorHub</div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
+            <button class="nav-tab" data-tab="audio">🎙️ Audio</button>
+            <button class="nav-tab" data-tab="explainer">📝 Explainer</button>
+            <button class="nav-tab" data-tab="reducer">🖼️ Reducer</button>
+            <button class="nav-tab" data-tab="renamer">✏️ Renamer</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Dashboard Panel -->
+        <div class="tool-panel active" id="panel-dashboard">
+            <div class="welcome-section">
+                <h1>Welcome to CreatorHub</h1>
+                <p>Your unified dashboard for content creation</p>
+                <div class="tools-grid">
+                    <div class="tool-card" data-tool="audio">
+                        <div class="tool-card-icon">🎙️</div>
+                        <h3>Audio Generator</h3>
+                        <p>Create multi-language TTS audio with ElevenLabs</p>
+                    </div>
+                    <div class="tool-card" data-tool="explainer">
+                        <div class="tool-card-icon">📝</div>
+                        <h3>Explainer Generator</h3>
+                        <p>Generate lesson introductions with Gemini AI</p>
+                    </div>
+                    <div class="tool-card" data-tool="reducer">
+                        <div class="tool-card-icon">🖼️</div>
+                        <h3>Image Reducer</h3>
+                        <p>Compress images to ~500KB smartly</p>
+                    </div>
+                    <div class="tool-card" data-tool="renamer">
+                        <div class="tool-card-icon">✏️</div>
+                        <h3>Image Renamer</h3>
+                        <p>Bulk rename images with custom names</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Generator Panel -->
+        <div class="tool-panel" id="panel-audio">
+            <div class="card">
+                <div class="card-title">🎙️ Audio Generator</div>
+                <div class="form-group">
+                    <label>Select Voice:</label>
+                    <div class="voice-buttons">
+                        <button type="button" class="voice-btn active" data-voice="french">🇫🇷 French</button>
+                        <button type="button" class="voice-btn" data-voice="spanish">🇪🇸 Spanish</button>
+                        <button type="button" class="voice-btn" data-voice="german">🇩🇪 German</button>
+                        <button type="button" class="voice-btn" data-voice="english">🇬🇧 English</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Enter Text:</label>
+                    <textarea id="audioText" placeholder="{bonjour comment allez vous}&#10;hello how are you today&#10;{merci beaucoup}"></textarea>
+                    <small>Use { } for native language, plain text for English</small>
+                </div>
+                <button class="btn btn-primary" id="generateAudioBtn">Generate Audio</button>
+                <div class="loading" id="audioLoading">
+                    <div class="spinner"></div>
+                    <p>Generating audio...</p>
+                </div>
+                <div id="audioResult"></div>
+            </div>
+        </div>
+
+        <!-- Explainer Generator Panel -->
+        <div class="tool-panel" id="panel-explainer">
+            <div class="card">
+                <div class="card-title">📝 Explainer Generator</div>
+                <div class="form-group">
+                    <label>Language:</label>
+                    <select id="explainerLanguage">
+                        <option value="">Select a language</option>
+                        <option value="French">French</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="German">German</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Portuguese">Portuguese</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Mandarin Chinese">Mandarin Chinese</option>
+                        <option value="Korean">Korean</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="Russian">Russian</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Topic:</label>
+                    <input type="text" id="explainerTopic" placeholder="e.g., Fruits, Colors, Animals">
+                </div>
+                <button class="btn btn-primary" id="generateExplainerBtn">Generate 5 Options</button>
+                <div class="loading" id="explainerLoading">
+                    <div class="spinner"></div>
+                    <p>Generating explainers...</p>
+                </div>
+                <div id="explainerOptions" class="options-grid" style="margin-top:20px;"></div>
+                <div id="explainerResult" style="display:none;margin-top:20px;">
+                    <div class="result-box success">
+                        <strong>Selected Explainer:</strong>
+                        <p id="selectedExplainer" style="margin-top:10px;font-size:1.1rem;"></p>
+                        <button class="copy-btn" id="copyExplainerBtn">📋 Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Reducer Panel -->
+        <div class="tool-panel" id="panel-reducer">
+            <div class="card">
+                <div class="card-title">🖼️ Image Reducer</div>
+                <div class="upload-area" id="reducerUploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div>Drag & drop images or click to select</div>
+                </div>
+                <input type="file" id="reducerFileInput" multiple accept="image/*" style="display:none;">
+                <div id="reducerFileList" class="file-list" style="margin-top:20px;"></div>
+                <div style="margin-top:20px;display:flex;gap:10px;">
+                    <button class="btn btn-secondary" id="clearReducerBtn">Clear All</button>
+                    <button class="btn btn-primary" id="compressBtn" disabled>Compress Images</button>
+                </div>
+                <div class="loading" id="reducerLoading">
+                    <div class="spinner"></div>
+                    <p id="reducerProgressText">Processing...</p>
+                    <div class="progress-bar"><div class="progress-fill" id="reducerProgressFill"></div></div>
+                </div>
+                <div id="reducerResult"></div>
+            </div>
+        </div>
+
+        <!-- Image Renamer Panel -->
+        <div class="tool-panel" id="panel-renamer">
+            <div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                <div>
+                    <div class="card-title">📷 Images</div>
+                    <div class="upload-area" id="renamerUploadArea">
+                        <div class="upload-icon">📁</div>
+                        <div>Drag & drop images or click to select</div>
+                    </div>
+                    <input type="file" id="renamerFileInput" multiple accept="image/*" style="display:none;">
+                    <div id="renamerFileList" class="file-list" style="margin-top:15px;"></div>
+                </div>
+                <div>
+                    <div class="card-title">✏️ Names</div>
+                    <textarea id="renamerNames" placeholder="Enter one name per line:&#10;bonjour_greeting&#10;merci_thanks&#10;au_revoir_goodbye" style="min-height:250px;"></textarea>
+                    <small id="renamerCount"></small>
+                </div>
+            </div>
+            <div class="card" id="renamerPreview" style="display:none;">
+                <div class="card-title">👁️ Preview</div>
+                <div id="renamerPreviewContent"></div>
+                <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;">
+                    <button class="btn btn-primary" id="saveRenamerBtn">💾 Save to Downloads</button>
+                    <button class="btn btn-secondary" id="openFolderBtn" style="display:none;">📂 Open Folder</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab Navigation
+        let selectedVoice = 'french';
+        let reducerFiles = [];
+        let renamerFiles = [];
+        let savedFolder = '';
+        let selectedExplainer = null;
+        let filesToDownload = [];
+
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const tool = card.dataset.tool;
+                document.querySelectorAll('.nav-tab').forEach(t => {
+                    t.classList.toggle('active', t.dataset.tab === tool);
+                });
+                document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('panel-' + tool).classList.add('active');
+            });
+        });
+
+        // Audio Generator
+        document.querySelectorAll('.voice-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.voice-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedVoice = btn.dataset.voice;
+            });
+        });
+
+        document.getElementById('generateAudioBtn').addEventListener('click', async () => {
+            const text = document.getElementById('audioText').value;
+            const btn = document.getElementById('generateAudioBtn');
+            const loading = document.getElementById('audioLoading');
+            const result = document.getElementById('audioResult');
+
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.innerHTML = '';
+
+            try {
+                const response = await fetch('/audio/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, voice: selectedVoice })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    let html = '<div class="result-box success"><strong>✅ Generated ' + data.count + ' audio file(s)</strong>';
+                    data.results.forEach(item => {
+                        html += '<div class="audio-item"><p><strong>' + (item.is_native ? '🌍 Native' : '🇬🇧 English') + ':</strong> ' + item.text + '</p><audio controls src="' + item.path + '"></audio></div>';
+                    });
+                    html += '</div>';
+                    result.innerHTML = html;
+                } else {
+                    result.innerHTML = '<div class="result-box error"><strong>❌ Error:</strong> ' + data.error + '</div>';
+                }
+            } catch (err) {
+                result.innerHTML = '<div class="result-box error"><strong>❌ Error:</strong> ' + err.message + '</div>';
+            }
+
+            btn.disabled = false;
+            loading.classList.remove('show');
+        });
+
+        // Explainer Generator
+        document.getElementById('generateExplainerBtn').addEventListener('click', async () => {
+            const language = document.getElementById('explainerLanguage').value;
+            const topic = document.getElementById('explainerTopic').value;
+            const btn = document.getElementById('generateExplainerBtn');
+            const loading = document.getElementById('explainerLoading');
+            const options = document.getElementById('explainerOptions');
+            const resultDiv = document.getElementById('explainerResult');
+
+            if (!language || !topic) {
+                alert('Please select language and enter topic');
+                return;
+            }
+
+            btn.disabled = true;
+            loading.classList.add('show');
+            options.innerHTML = '';
+            resultDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/explainer/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ language, topic })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    data.explainers.forEach((text, i) => {
+                        const card = document.createElement('div');
+                        card.className = 'option-card';
+                        card.innerHTML = '<strong>' + (i + 1) + '.</strong> ' + text;
+                        card.addEventListener('click', () => {
+                            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                            card.classList.add('selected');
+                            selectedExplainer = text;
+                            document.getElementById('selectedExplainer').textContent = text;
+                            resultDiv.style.display = 'block';
+                        });
+                        options.appendChild(card);
+                    });
+                } else {
+                    options.innerHTML = '<div class="result-box error">Error: ' + data.error + '</div>';
+                }
+            } catch (err) {
+                options.innerHTML = '<div class="result-box error">Error: ' + err.message + '</div>';
+            }
+
+            btn.disabled = false;
+            loading.classList.remove('show');
+        });
+
+        document.getElementById('copyExplainerBtn').addEventListener('click', () => {
+            if (selectedExplainer) {
+                navigator.clipboard.writeText(selectedExplainer);
+                document.getElementById('copyExplainerBtn').textContent = '✅ Copied!';
+                setTimeout(() => {
+                    document.getElementById('copyExplainerBtn').textContent = '📋 Copy';
+                }, 2000);
+            }
+        });
+
+        // Image Reducer
+        const reducerUploadArea = document.getElementById('reducerUploadArea');
+        const reducerFileInput = document.getElementById('reducerFileInput');
+
+        reducerUploadArea.addEventListener('click', () => reducerFileInput.click());
+        reducerFileInput.addEventListener('change', (e) => addReducerFiles(Array.from(e.target.files)));
+
+        ['dragover', 'dragenter'].forEach(evt => {
+            reducerUploadArea.addEventListener(evt, e => { e.preventDefault(); reducerUploadArea.classList.add('dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            reducerUploadArea.addEventListener(evt, () => reducerUploadArea.classList.remove('dragover'));
+        });
+        reducerUploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            addReducerFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+        });
+
+        function addReducerFiles(files) {
+            files.filter(f => f.type.startsWith('image/')).forEach(file => {
+                reducerFiles.push({ file, thumb: URL.createObjectURL(file) });
+            });
+            renderReducerFiles();
+        }
+
+        function renderReducerFiles() {
+            const list = document.getElementById('reducerFileList');
+            list.innerHTML = '';
+            reducerFiles.forEach((f, i) => {
+                list.innerHTML += '<div class="file-item"><img src="' + f.thumb + '"><span class="file-item-name">' + f.file.name + '</span><button class="file-item-remove" onclick="removeReducerFile(' + i + ')">×</button></div>';
+            });
+            document.getElementById('compressBtn').disabled = reducerFiles.length === 0;
+        }
+
+        window.removeReducerFile = function(i) {
+            URL.revokeObjectURL(reducerFiles[i].thumb);
+            reducerFiles.splice(i, 1);
+            renderReducerFiles();
+        };
+
+        document.getElementById('clearReducerBtn').addEventListener('click', () => {
+            reducerFiles.forEach(f => URL.revokeObjectURL(f.thumb));
+            reducerFiles = [];
+            renderReducerFiles();
+            document.getElementById('reducerResult').innerHTML = '';
+        });
+
+        document.getElementById('compressBtn').addEventListener('click', async () => {
+            if (reducerFiles.length === 0) return;
+
+            const btn = document.getElementById('compressBtn');
+            const loading = document.getElementById('reducerLoading');
+            const progressText = document.getElementById('reducerProgressText');
+            const progressFill = document.getElementById('reducerProgressFill');
+            const result = document.getElementById('reducerResult');
+
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.innerHTML = '';
+            filesToDownload = [];
+            let results = [];
+
+            for (let i = 0; i < reducerFiles.length; i++) {
+                progressText.textContent = 'Processing ' + reducerFiles[i].file.name + '... (' + (i + 1) + '/' + reducerFiles.length + ')';
+                progressFill.style.width = ((i / reducerFiles.length) * 100) + '%';
+
+                const formData = new FormData();
+                formData.append('image', reducerFiles[i].file);
+
+                try {
+                    const response = await fetch('/image/compress', { method: 'POST', body: formData });
+                    const data = await response.json();
+                    if (data.success) {
+                        results.push(data);
+                        filesToDownload.push({ display: data.new_name, safe: data.safe_filename || data.new_name });
+                    } else {
+                        results.push({ error: true, original_name: reducerFiles[i].file.name, message: data.error });
+                    }
+                } catch (err) {
+                    results.push({ error: true, original_name: reducerFiles[i].file.name, message: err.message });
+                }
+            }
+
+            progressFill.style.width = '100%';
+            progressText.textContent = 'Complete!';
+
+            setTimeout(() => {
+                loading.classList.remove('show');
+                let html = '<div class="result-box success"><strong>✅ Compression Complete</strong>';
+                results.forEach(r => {
+                    if (r.error) {
+                        html += '<div class="file-item" style="background:#ffebee;">❌ ' + r.original_name + ': ' + r.message + '</div>';
+                    } else {
+                        html += '<div class="file-item"><strong>' + r.new_name + '</strong> - ' + formatSize(r.original_size) + ' → ' + formatSize(r.new_size) + ' (' + r.reduction.toFixed(1) + '% smaller)</div>';
+                    }
+                });
+                html += '<button class="btn btn-primary" style="margin-top:15px;" onclick="downloadAllReduced()">⬇️ Download All</button></div>';
+                result.innerHTML = html;
+                btn.disabled = false;
+            }, 500);
+        });
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        window.downloadAllReduced = async function() {
+            for (let i = 0; i < filesToDownload.length; i++) {
+                const f = filesToDownload[i];
+                const link = document.createElement('a');
+                link.href = '/image/download/' + encodeURIComponent(f.safe);
+                link.download = f.display;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                if (i < filesToDownload.length - 1) await new Promise(r => setTimeout(r, 500));
+            }
+        };
+
+        // Image Renamer
+        const renamerUploadArea = document.getElementById('renamerUploadArea');
+        const renamerFileInput = document.getElementById('renamerFileInput');
+
+        renamerUploadArea.addEventListener('click', () => renamerFileInput.click());
+        renamerFileInput.addEventListener('change', (e) => addRenamerFiles(Array.from(e.target.files)));
+
+        ['dragover', 'dragenter'].forEach(evt => {
+            renamerUploadArea.addEventListener(evt, e => { e.preventDefault(); renamerUploadArea.classList.add('dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            renamerUploadArea.addEventListener(evt, () => renamerUploadArea.classList.remove('dragover'));
+        });
+        renamerUploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            addRenamerFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+        });
+
+        function addRenamerFiles(files) {
+            files.filter(f => f.type.startsWith('image/')).forEach(file => {
+                renamerFiles.push({ file, thumb: URL.createObjectURL(file) });
+            });
+            renderRenamerFiles();
+            updateRenamerPreview();
+        }
+
+        function renderRenamerFiles() {
+            const list = document.getElementById('renamerFileList');
+            list.innerHTML = '';
+            renamerFiles.forEach((f, i) => {
+                list.innerHTML += '<div class="file-item"><img src="' + f.thumb + '"><span class="file-item-name">' + f.file.name + '</span><button class="file-item-remove" onclick="removeRenamerFile(' + i + ')">×</button></div>';
+            });
+        }
+
+        window.removeRenamerFile = function(i) {
+            URL.revokeObjectURL(renamerFiles[i].thumb);
+            renamerFiles.splice(i, 1);
+            renderRenamerFiles();
+            updateRenamerPreview();
+        };
+
+        document.getElementById('renamerNames').addEventListener('input', updateRenamerPreview);
+
+        function getRenamerNames() {
+            return document.getElementById('renamerNames').value.split('\n').filter(n => n.trim()).map(n => n.trim());
+        }
+
+        function updateRenamerPreview() {
+            const names = getRenamerNames();
+            const count = document.getElementById('renamerCount');
+            const preview = document.getElementById('renamerPreview');
+            const content = document.getElementById('renamerPreviewContent');
+
+            if (names.length > 0 && renamerFiles.length > 0) {
+                count.textContent = names.length === renamerFiles.length
+                    ? '✓ ' + names.length + ' names match ' + renamerFiles.length + ' images'
+                    : '⚠ ' + names.length + ' names vs ' + renamerFiles.length + ' images';
+                count.style.color = names.length === renamerFiles.length ? 'green' : 'orange';
+            } else {
+                count.textContent = names.length + ' names entered';
+                count.style.color = '#666';
+            }
+
+            if (renamerFiles.length === 0 || names.length === 0) {
+                preview.style.display = 'none';
+                return;
+            }
+
+            preview.style.display = 'block';
+            const pairs = Math.min(renamerFiles.length, names.length);
+            let html = '<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">Preview</th><th style="text-align:left;padding:10px;">Original</th><th style="padding:10px;">→</th><th style="text-align:left;padding:10px;">New Name</th></tr></thead><tbody>';
+            for (let i = 0; i < pairs; i++) {
+                const ext = renamerFiles[i].file.name.substring(renamerFiles[i].file.name.lastIndexOf('.'));
+                html += '<tr><td style="padding:10px;"><img src="' + renamerFiles[i].thumb + '" style="width:40px;height:40px;border-radius:6px;object-fit:cover;"></td><td style="padding:10px;color:#666;">' + renamerFiles[i].file.name + '</td><td style="padding:10px;color:#667eea;text-align:center;">→</td><td style="padding:10px;color:#4CAF50;font-weight:600;">' + names[i] + ext + '</td></tr>';
+            }
+            html += '</tbody></table>';
+            content.innerHTML = html;
+        }
+
+        document.getElementById('saveRenamerBtn').addEventListener('click', async () => {
+            const names = getRenamerNames();
+            const pairs = Math.min(renamerFiles.length, names.length);
+            if (!pairs) return;
+
+            const btn = document.getElementById('saveRenamerBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Saving...';
+
+            const formData = new FormData();
+            formData.append('names', names.join('\n'));
+            for (let i = 0; i < pairs; i++) {
+                formData.append('images', renamerFiles[i].file);
+            }
+
+            try {
+                const resp = await fetch('/renamer/rename', { method: 'POST', body: formData });
+                const data = await resp.json();
+                if (data.success) {
+                    savedFolder = data.folder;
+                    document.getElementById('openFolderBtn').style.display = '';
+                    alert('✅ ' + data.count + ' images saved to Downloads!');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+
+            btn.disabled = false;
+            btn.textContent = '💾 Save to Downloads';
+        });
+
+        document.getElementById('openFolderBtn').addEventListener('click', async () => {
+            if (savedFolder) {
+                await fetch('/renamer/open-folder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ folder: savedFolder })
+                });
+            }
+        });
+    </script>
+</body>
+</html>
