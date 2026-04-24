@@ -1,4 +1,4 @@
-# 🌐 LingoTran Tools Dashboard
+# 🌐 Creator Hub Dashboard
 
 A unified Flask dashboard combining multiple content creation tools for language learning platforms.
 
@@ -20,7 +20,7 @@ A unified Flask dashboard combining multiple content creation tools for language
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/lingotran-dashboard.git
+git clone https://github.com/yourusername/creatorhub-dashboard.git
 cd lingotran-dashboard
 ```
 
